@@ -169,6 +169,8 @@ IF(KOGNAC_LIB)
     include_directories(${KOGNAC_INC})
     add_library(kognac STATIC IMPORTED)
     set_property(TARGET kognac PROPERTY IMPORTED_LOCATION ${KOGNAC_LIB})
+    add_library(kognac-log SHARED IMPORTED)
+    set_property(TARGET kognac-log PROPERTY IMPORTED_LOCATION "${KOGNAC_LOG}")
 ELSE()
     ExternalProject_Add(git-kognac
         DOWNLOAD_COMMAND git clone https://github.com/karmaresearch/kognac.git
@@ -183,6 +185,9 @@ ELSE()
     add_library(kognac STATIC IMPORTED)
     add_dependencies(kognac git-kognac)
     set_property(TARGET kognac PROPERTY IMPORTED_LOCATION kognac/libkognac.a)
+    add_library(kognac-log SHARED IMPORTED)
+    add_dependencies(kognac-log git-kognac)
+    set_property(TARGET kognac-log PROPERTY IMPORTED_LOCATION "kognac/libkognac-log${CMAKE_SHARED_LIBRARY_SUFFIX}")
 ENDIF()
 
 #add files to compile
@@ -213,6 +218,6 @@ if (CMAKE_THREAD_LIBS_INIT)
 endif()
 
 #Create both a library and the executable program
-TARGET_LINK_LIBRARIES(trident curl kognac lz4 tbb snap ${rt} ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
+TARGET_LINK_LIBRARIES(trident curl kognac kognac-log lz4 tbb snap ${rt} ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
 TARGET_LINK_LIBRARIES(tridentp trident ${PY3_LIBRARIES})
 TARGET_LINK_LIBRARIES(trident_exec trident)
